@@ -51,7 +51,7 @@ impl Response {
                 .build()
                 .unwrap();
 
-            let mut body = res.body_mut();
+            let body = res.body_mut();
             tokio_runtime.block_on(async move {
                 loop {
                     match body.next().await {
