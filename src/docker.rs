@@ -123,9 +123,15 @@ fn api_result<D: DeserializeOwned>(mut res: Response) -> result::Result<D, Error
         Ok(serde_json::from_str::<D>(&ps)?)
         //Ok(serde_json::from_reader::<_, D>(res)?)
     } else {
+        let mut v = String::new();
+        res.read_to_string(&mut v);
+        let ps = serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&v)?)?;
+
+        println!("api error: {ps}");
+        Err(serde_json::from_str::<DockerError>(&ps)?.into())
         //let value: serde_json::Value = serde_json::from_reader(res)?;
         //println!("api error: {:#?}", &value);
-        Err(serde_json::from_reader::<_, DockerError>(res)?.into())
+        //Err(serde_json::from_reader::<_, DockerError>(res)?.into())
     }
 }
 
