@@ -4,6 +4,7 @@ use futures::prelude::*;
 use futures::stream::FusedStream;
 use http::{HeaderMap, Request, StatusCode};
 use hyper::Uri;
+use log::error;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
@@ -57,7 +58,9 @@ impl Response {
                     match body.next().await {
                         None => { break }
                         Some(res) => {
-                            tx.send(res.unwrap()).await.unwrap();
+                            if let Err(e) = tx.send(res.unwrap()).await {
+                                error!("Dockworker could not send response to receiver: {e}");
+                            }
                         }
                     }
                 }
